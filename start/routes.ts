@@ -21,14 +21,21 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  Route.resource('users', 'UsersController').apiOnly()
+  Route.resource('users', 'UsersController').apiOnly().middleware({
+    index: 'auth',
+    show: 'auth',
+    update: 'auth',
+    destroy: 'auth',
+  })
 
+  // Auth routes
   Route.group(() => {
+    Route.get('me', 'AuthController.me').middleware('auth')
     Route.get('logout', 'AuthController.logout').middleware('auth')
     Route.get('refresh', 'AuthController.refresh').middleware('auth')
     Route.get('test', async () => ({ message: 'Hello world' })).middleware('auth')
 
-    Route.post('login', 'AuthController.login')
+    Route.post('login', 'AuthController.login') // public
   }).prefix('auth')
 
   // Protected routes

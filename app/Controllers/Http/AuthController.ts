@@ -39,4 +39,8 @@ export default class AuthController {
       expiresIn: '7 days',
     })
   }
+
+  public async me({ auth }: HttpContextContract) {
+    return auth.user!
+  }
 }
