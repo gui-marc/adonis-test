@@ -27,4 +27,12 @@ export default class AuthController {
   public async logout({ auth }: HttpContextContract) {
     await auth.use('api').logout()
   }
+
+  public async refresh({ auth }: HttpContextContract) {
+    const user = auth.user!
+
+    return await auth.use('api').generate(user, {
+      expiresIn: '7 days',
+    })
+  }
 }

@@ -26,6 +26,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post('login', 'AuthController.login')
     Route.get('logout', 'AuthController.logout').middleware('auth')
+    Route.get('refresh', 'AuthController.refresh').middleware('auth')
     Route.get('test', async () => ({ message: 'Hello world' })).middleware('auth')
   }).prefix('auth')
 }).prefix('api')
