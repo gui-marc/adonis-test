@@ -23,7 +23,13 @@
       ],
       "Database/*": [
         "./database/*"
-      ]
+      ],
+      "Utils/*": [
+        "./utils/*"
+      ],
+      "Constants/*": [
+        "./constants/*"
+      ],
     },
     "types": [
       "@adonisjs/core",

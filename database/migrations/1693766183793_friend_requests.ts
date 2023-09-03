@@ -13,8 +13,6 @@ export default class extends BaseSchema {
       table.string('status').defaultTo('pending')
       // table.enum('status', ['pending', 'accepted', 'rejected']).defaultTo('pending') SQLite doesn't support enum
 
-      table.unique(['sender_id', 'receiver_id'])
-
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

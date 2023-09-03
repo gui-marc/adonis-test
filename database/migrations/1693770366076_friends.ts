@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.integer('sender_id').unsigned().references('users.id').onDelete('CASCADE')
       table.integer('receiver_id').unsigned().references('users.id').onDelete('CASCADE')
 
+      table.unique(['sender_id', 'receiver_id'])
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

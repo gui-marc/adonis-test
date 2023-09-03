@@ -1,13 +1,15 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Friend from 'App/Models/Friend'
 import FriendRequest, { FriendRequestStatus } from 'App/Models/FriendRequest'
+import Ws from 'App/Services/Ws'
+import { WebsocketEvents } from 'Constants/ws'
 
 export default class FriendRequestsController {
   constructor(protected ctx: HttpContextContract) {}
 
   public async received({ auth }: HttpContextContract) {
     const user = auth.user!
-    return await FriendRequest.query().where('receiver_id   ', user.id).preload('sender')
+    return await FriendRequest.query().where('receiver_id', user.id).preload('sender')
   }
 
   public async sent({ auth }: HttpContextContract) {
@@ -25,8 +27,7 @@ export default class FriendRequestsController {
     const existingRequest = await FriendRequest.query()
       .where('sender_id', user.id)
       .where('receiver_id', params.receiverId)
-      .where('status', FriendRequestStatus.PENDING)
-      .orWhere('status', FriendRequestStatus.ACCEPTED)
+      .where('status', [FriendRequestStatus.PENDING, FriendRequestStatus.ACCEPTED])
       .first()
 
     if (existingRequest) {
@@ -37,6 +38,15 @@ export default class FriendRequestsController {
       senderId: user.id,
       receiverId: params.receiverId,
     })
+
+    const friendRequestForReceiver = await FriendRequest.query()
+      .preload('sender')
+      .where('id', friendRequest.id)
+      .firstOrFail()
+
+    await Ws.io
+      .to(`user:${friendRequest.receiverId}`)
+      .emit(WebsocketEvents.FriendRequestReceived, friendRequestForReceiver)
 
     return friendRequest
   }
@@ -59,6 +69,15 @@ export default class FriendRequestsController {
       receiverId: friendRequest.receiverId,
     })
 
+    const friendRequestForSender = await FriendRequest.query()
+      .preload('receiver')
+      .where('id', friendRequest.id)
+      .firstOrFail()
+
+    await Ws.io
+      .to(`user:${friendRequest.senderId}`)
+      .emit(WebsocketEvents.FriendRequestAccepted, friendRequestForSender)
+
     return friendRequest
   }
 
@@ -75,6 +94,15 @@ export default class FriendRequestsController {
 
     await friendRequest.save()
 
+    const friendRequestForSender = await FriendRequest.query()
+      .preload('receiver')
+      .where('id', friendRequest.id)
+      .firstOrFail()
+
+    await Ws.io
+      .to(`user:${friendRequest.senderId}`)
+      .emit(WebsocketEvents.FriendRequestRejected, friendRequestForSender)
+
     return friendRequest
   }
 
@@ -88,6 +116,15 @@ export default class FriendRequestsController {
       .firstOrFail()
 
     await friendRequest.delete()
+
+    const friendRequestForReceiver = await FriendRequest.query()
+      .preload('sender')
+      .where('id', friendRequest.id)
+      .firstOrFail()
+
+    await Ws.io
+      .to(`user:${friendRequest.receiverId}`)
+      .emit(WebsocketEvents.FriendRequestCanceled, friendRequestForReceiver)
 
     return friendRequest
   }
