@@ -8,7 +8,11 @@ export default class AuthController {
   public async login({ auth, request, response }: HttpContextContract) {
     const { email, password } = request.body()
 
-    const user = await User.findByOrFail('email', email)
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return response.badRequest('Invalid credentials')
+    }
 
     if (!(await Hash.verify(user.password, password))) {
       return response.badRequest('Invalid credentials')

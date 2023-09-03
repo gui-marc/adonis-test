@@ -24,9 +24,26 @@ Route.group(() => {
   Route.resource('users', 'UsersController').apiOnly()
 
   Route.group(() => {
-    Route.post('login', 'AuthController.login')
     Route.get('logout', 'AuthController.logout').middleware('auth')
     Route.get('refresh', 'AuthController.refresh').middleware('auth')
     Route.get('test', async () => ({ message: 'Hello world' })).middleware('auth')
+
+    Route.post('login', 'AuthController.login')
   }).prefix('auth')
+
+  // Protected routes
+  Route.group(() => {
+    Route.group(() => {
+      Route.get('sent', 'FriendRequestsController.sent')
+      Route.get('received', 'FriendRequestsController.received')
+
+      Route.post(':receiverId', 'FriendRequestsController.create')
+      Route.delete(':receiverId/cancel', 'FriendRequestsController.cancel')
+
+      Route.post(':senderId/accept', 'FriendRequestsController.accept')
+      Route.post(':senderId/reject', 'FriendRequestsController.reject')
+    }).prefix('friend-requests')
+
+    Route.get('friends', 'FriendsController.index')
+  }).middleware('auth')
 }).prefix('api')
