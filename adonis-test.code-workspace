@@ -1,0 +1,12 @@
+{
+  "folders": [
+    {
+      "name": "Backend (Adonis)",
+      "path": "backend"
+    },
+    {
+      "name": "Frontend (Vue)",
+      "path": "frontend"
+    }
+  ]
+}
