@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, HasOne, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { HasOne, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
+import AppBaseModel from './AppBaseModel'
 
-export default class Friend extends BaseModel {
+export default class Friend extends AppBaseModel {
   @hasOne(() => User, { foreignKey: 'id' })
   public sender: HasOne<typeof User>
 

@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import FriendRequest from './FriendRequest'
+import AppBaseModel from './AppBaseModel'
 
-export default class User extends BaseModel {
+export default class User extends AppBaseModel {
   @hasMany(() => FriendRequest, { foreignKey: 'sender_id' })
   public sentFriendRequests: HasMany<typeof FriendRequest>
 
